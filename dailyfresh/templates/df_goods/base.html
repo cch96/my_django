@@ -8,7 +8,7 @@
 				{% if request.session.user_name %}
 				<div class="login_info fl">
 					欢迎您：<em>{{request.session.user_name}}</em>
-                    <a href="" class="fr" id="quit">退出</a>
+                    <a href="/user/quit" class="fr" id="quit">退出</a>
 				</div>
                 {% else %}
 				<div class="login_btn fl">
@@ -22,7 +22,7 @@
 					<span>|</span>
 					<a href="/user/user_center_info.html">用户中心</a>
 					<span>|</span>
-					<a href="cart.html">我的购物车</a>
+					<a href="/user/cart">我的购物车</a>
 					<span>|</span>
 					<a href="/user/user_center_order.html">我的订单</a>
 				</div>

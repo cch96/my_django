@@ -41,3 +41,6 @@ class Goods(models.Model):
     gthumb = models.ImageField(upload_to='df_goods/goods')
     gpic = models.ImageField(upload_to='df_goods/pic_detail')
     gmanager = GoodsManager()
+
+    def __str__(self):
+        return self.gtitle

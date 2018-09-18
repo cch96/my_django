@@ -7,9 +7,14 @@ class InlineUserAddress(admin.StackedInline):
     extra = 3
 '''
 # TODO 有收货数据后把内联给做完
-class MyAdmin(admin.ModelAdmin):
+class MyUser(admin.ModelAdmin):
     list_display = ['user', 'mail']
-    #inlines = [InlineUserAddress]
+    # inlines = [InlineUserAddress]
+
+
+class MyCart(admin.ModelAdmin):
+    list_display = ['user', 'goods']
 
 admin.site.register(UserAddress)
-admin.site.register(UserRegister, MyAdmin)
+admin.site.register(UserInfo, MyUser)
+admin.site.register(Cart, MyCart)

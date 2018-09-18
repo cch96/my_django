@@ -18,10 +18,12 @@
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
 		</div>
+		{% if order_num != -1 %}
 		<div class="guest_cart fr">
-			<a href="#" class="cart_name fl">我的购物车</a>
-			<div class="goods_count fl" id="show_count">1</div>
+			<a href="/user/cart" class="cart_name fl">我的购物车</a>
+			<div class="goods_count fl" id="show_count">{{order_num}}</div>
 		</div>
+		{% endif %}
 	</div>
 
 	<div class="navbar_con">
@@ -46,7 +48,7 @@
 			<li><a href="#model05" class="vegetables">新鲜蔬菜</a></li>
 			<li><a href="#model06" class="ice">速冻食品</a></li>
 		</ul>
-		<div class="slide fl">
+        <div class="slide fl">
 			<ul class="slide_pics">
 				<li><img src="/static/images/slide.jpg" alt="幻灯片"></li>
 				<li><img src="/static/images/slide02.jpg" alt="幻灯片"></li>

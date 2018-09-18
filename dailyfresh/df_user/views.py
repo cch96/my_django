@@ -27,7 +27,7 @@ def register(request):
 
 def registerHandle(request):
     # 插入数据库
-    user_register = models.UserRegister()
+    user_register = models.UserInfo()
     user_register.user = request.POST['user_name']
     user_register.mail = request.POST['email']
     # 判断两次输入的密码是否一致
@@ -54,7 +54,7 @@ def login_handle(request):
     password = request.POST['pwd']
     remember = request.POST.get('remember_user', 0)
     # 在数据库中查找登陆页面提交的用户名
-    result = UserRegister.objects.filter(user=user)
+    result = UserInfo.objects.filter(user=user)
     # 如果用户名不存在
     if not result:
         return render(request, 'df_user/login.html', {'error_user': True, 'user_name': user})
@@ -84,7 +84,7 @@ def login_handle(request):
 @check_login
 def user_center(request):
     # 获取页面
-    result = UserRegister.objects.get(user=request.session['user_name'])
+    result = UserInfo.objects.get(user=request.session['user_name'])
     user = result.user
     mail = result.mail
     looks = request.COOKIES['looks'].split(',')
@@ -131,6 +131,31 @@ def user_site_handle(request):
     return redirect('/user/user_center_site')
 
 
+def cart(request):
+    list = Cart.objects.filter(user_id=request.session['user_id'])
+    cart_list = []
+    for item in list:
+        cart_list.append(item.goods)
+    return render(request, 'df_user/cart.html', {'list': cart_list})
+
+
+def add_cart(request):
+    # 如果是ajax请求
+    if request.is_ajax():
+        # 购物车数据库增加数据
+        cart = Cart()
+        cart.goods_id = request.GET['goods']
+        cart.user_id = request.session['user_id']
+        cart.save()
+        # 修改用户的购物车里的商品数量
+        user = UserInfo.objects.get(pk=request.session['user_id'])
+        user.order_num = user.order_num + 1
+        user.save()
+        return JsonResponse({'status': 'ok', 'order_num': user.order_num})
+    # 否则
+
+
 def quit(request):
     request.session.flush()
+    return HttpResponseRedirect('/')
 
