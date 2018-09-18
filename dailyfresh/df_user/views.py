@@ -1,7 +1,24 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from . import  models
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from df_user.models import *
+from df_goods.models import *
 import hashlib
+
+
+def check_login(func):
+    # 如果session不存在，则要重新登入(转入到登陆界面)
+    def wrapper(request):
+        if 'user_id' not in request.session.keys():
+            return redirect('/user/login')
+        return func(request)
+    return wrapper
+
+
+def check_login1(request):
+    if 'user_id' in request.session.keys():
+        return JsonResponse({'code':1, 'msg':{'user_name': request.session['user_name']}})
+    else:
+        return JsonResponse({'code':0, 'msg':{}})
 
 
 def register(request):
@@ -9,15 +26,15 @@ def register(request):
 
 
 def registerHandle(request):
-    #插入数据库
+    # 插入数据库
     user_register = models.UserRegister()
     user_register.user = request.POST['user_name']
     user_register.mail = request.POST['email']
-    #判断两次输入的密码是否一致
+    # 判断两次输入的密码是否一致
     pwd2 = request.POST['cpwd']
     pwd1 = request.POST['pwd']
     if pwd1 == pwd2:
-        #密码加密
+        # 密码加密
         s1 = hashlib.sha1()
         s1.update(pwd1.encode('utf8'))
         user_register.password = s1.hexdigest()
@@ -37,7 +54,7 @@ def login_handle(request):
     password = request.POST['pwd']
     remember = request.POST.get('remember_user', 0)
     # 在数据库中查找登陆页面提交的用户名
-    result = models.UserRegister.objects.filter(user=user)
+    result = UserRegister.objects.filter(user=user)
     # 如果用户名不存在
     if not result:
         return render(request, 'df_user/login.html', {'error_user': True, 'user_name': user})
@@ -64,40 +81,47 @@ def login_handle(request):
     return response
 
 
+@check_login
 def user_center(request):
-    # 如果session存在，表示登入过则获取页面
-    if 'user_id' in request.session.keys():
-        result = models.UserRegister.objects.get(user=request.session['user_name'])
-        user = result.user
-        mail = result.mail
-        return render(request, 'df_user/user_center_info.html', {'user': user, 'mail': mail})
-    # 如果cookie不存在，则要重新登入(转入到登陆界面)
-    return redirect('/user/login')
+    # 获取页面
+    result = UserRegister.objects.get(user=request.session['user_name'])
+    user = result.user
+    mail = result.mail
+    looks = request.COOKIES['looks'].split(',')
+    looks = Goods.gmanager.filter(pk__in=looks)
+    return render(request, 'df_user/user_center_info.html', {'user': user, 'mail': mail, 'looks': looks})
 
 
+@check_login
 def user_center_order(request):
-    if 'user_id' in request.session.keys():
-        return render(request, 'df_user/user_center_order.html')
-    return redirect('/user/login')
+    return render(request, 'df_user/user_center_order.html')
 
 
+@check_login
 def user_center_site(request):
-    if 'user_id' in request.session.keys():
-        id = request.session['user_id']
-        info = models.UserAddress.objects.filter(user_id=id)[0]
+    id = request.session['user_id']
+    info = UserAddress.objects.filter(user_id=id)
+    if info:
         context = {
             'recipients': info.recipients,
             'detail_address': info.detail_address,
             'zip_code': info.zip_code,
             'mobile_phone': info.mobile_phone
         }
-        return render(request, 'df_user/user_center_site.html', context)
-    return redirect('/user/login')
+    else:
+        context = {
+            'recipients': '',
+            'detail_address': '',
+            'zip_code': '',
+            'mobile_phone': ''
+        }
+
+    return render(request, 'df_user/user_center_site.html', context)
 
 
 def user_site_handle(request):
     post = request.POST
-    user_site = models.UserAddress()
+    user_site = UserAddress()
     user_site.recipients = post['recipients']
     user_site.detail_address = post['detail_address']
     user_site.zip_code = post['zip_code']
@@ -107,16 +131,6 @@ def user_site_handle(request):
     return redirect('/user/user_center_site')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+def quit(request):
+    request.session.flush()
 

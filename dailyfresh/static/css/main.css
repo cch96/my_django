@@ -16,9 +16,12 @@ html,body{height:100%}
 .welcome,.login_info,.login_btn,.user_link{
 	line-height:29px;
 }
-
 .login_info{
-	display:none;
+    width:120px;
+}
+
+.login_info a{
+    color:#666;
 }
 
 .login_info em{color:#ff8800}
@@ -27,7 +30,7 @@ html,body{height:100%}
 	color:#666;
 }
 
-.login_btn a:hover,.user_link a:hover{
+.login_info a:hover, .login_btn a:hover,.user_link a:hover{
 	color:#ff8800;
 }
 

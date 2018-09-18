@@ -1,15 +1,15 @@
-{% extends base.html%}
+{% extends 'df_goods/base.html' %}
 
 {% block head%}
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>天天生鲜-商品详情</title>
-	<link rel="stylesheet" type="text/css" href="css/reset.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
 {% endblock head%}
 
 {% block body_center%}
 	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="images/logo.png"></a>
+		<a href="/" class="logo fl"><img src="/static/images/logo.png"></a>
 		<div class="search_con fl">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
@@ -53,21 +53,21 @@
 	</div>
 
 	<div class="goods_detail_con clearfix">
-		<div class="goods_detail_pic fl"><img src="images/goods_detail.jpg"></div>
+		<div class="goods_detail_pic fl"><img src="/static/media/{{goods.gpic}}"></div>
 
 		<div class="goods_detail_list fr">
-			<h3>大兴大棚草莓</h3>
-			<p>草莓浆果柔软多汁，味美爽口，适合速冻保鲜贮藏。草莓速冻后，可以保持原有的色、香、味，既便于贮藏，又便于外销。</p>
+			<h3>{{goods.gtitle}}</h3>
+			<p>{{goods.ginfo}}</p>
 			<div class="prize_bar">
-				<span class="show_pirze">¥<em>16.80</em></span>
-				<span class="show_unit">单  位：500g</span>
+				<span class="show_pirze">¥<em>{{goods.price}}</em></span>
+				<span class="show_unit">单  位：{{goods.unit}}</span>
 			</div>
 			<div class="goods_num clearfix">
 				<div class="num_name fl">数 量：</div>
 				<div class="num_add fl">
 					<input type="text" class="num_show fl" value="1">
 					<a href="javascript:;" class="add fr">+</a>
-					<a href="javascript:;" class="minus fr">-</a>	
+					<a href="javascript:;" class="minus fr">-</a>
 				</div> 
 			</div>
 			<div class="total">总价：<em>16.80元</em></div>
@@ -83,16 +83,15 @@
 			<div class="new_goods">
 				<h3>新品推荐</h3>
 				<ul>
+					{% for adv in list %}
 					<li>
-						<a href="#"><img src="images/goods/goods001.jpg"></a>
-						<h4><a href="#">进口柠檬</a></h4>
-						<div class="prize">￥3.90</div>
+						{# 由货物的id去请求对应的图片#}
+						<a href="#"><img src="/static/media/{{adv.gthumb}}"></a>
+						<h4><a href="#">{{adv.gtitle}}</a></h4>
+						<div class="prize">￥{{adv.price}}</div>
 					</li>
-					<li>
-						<a href="#"><img src="images/goods/goods002.jpg"></a>
-						<h4><a href="#">玫瑰香葡萄</a></h4>
-						<div class="prize">￥16.80</div>
-					</li>
+
+					{% endfor %}
 				</ul>
 			</div>
 		</div>
@@ -115,25 +114,24 @@
 
 	<div class="add_jump"></div>
 
-	<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript">
-		var $add_x = $('#add_cart').offset().top;
-		var $add_y = $('#add_cart').offset().left;
-
-		var $to_x = $('#show_count').offset().top;
-		var $to_y = $('#show_count').offset().left;
-
-		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
-		$('#add_cart').click(function(){
-			$(".add_jump").stop().animate({
-				'left': $to_y+7,
-				'top': $to_x+7},
-				"fast", function() {
-					$(".add_jump").fadeOut('fast',function(){
-						$('#show_count').html(2);
-					});
-
-			});
+		$num_show = $('.num_show');
+		$total = $('.total em')
+		$num_show.val(1);
+		$('.add').click(function(){
+			num = parseInt($num_show.val())+1
+			$num_show.val(num);
+			$total.text((parseInt({{goods.price}})*num).toFixed(2)+'元')
+		});
+		$('.minus').click(function(){
+			num = parseInt($num_show.val())-1
+			$num_show.val(num);
+			$total.text((parseInt({{goods.price}})*num).toFixed(2)+'元')
+			if ($num_show.val() < 1) {
+				$num_show.val(0);
+				$total.text(0);
+			}
 		})
 	</script>
 {% endblock body_center%}
