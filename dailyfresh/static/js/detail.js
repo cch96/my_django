@@ -47,3 +47,15 @@ $('.buy_btn').click(function(){
         }
     })
 })
+//评论切换
+$('.detail_tab').delegate('li', 'click', function(){
+    $(this).addClass('active').siblings().removeClass('active');
+    if ($(this).val() == '0'){
+        $('.tab_content').show();
+        $('.tab_comment').hide();
+    }
+    else{
+        $('.tab_content').hide();
+        $('.tab_comment').show();
+    }
+})

@@ -64,22 +64,39 @@
 
 		<div class="r_wrap fr clearfix">
 			<ul class="detail_tab clearfix">
-				<li class="active">商品介绍</li>
-				<li>评论</li>
+				<li class="active" value="0">商品介绍</li>
+				<li value="1">评论</li>
 			</ul>
 
 			<div class="tab_content">
 				<dl>
 					<dt>商品详情：</dt>
-					<dd>草莓采摘园位于北京大兴区 庞各庄镇四各庄村 ，每年1月-6月面向北京以及周围城市提供新鲜草莓采摘和精品礼盒装草莓，草莓品种多样丰富，个大香甜。所有草莓均严格按照有机标准培育，不使用任何化肥和农药。草莓在采摘期间免洗可以直接食用。欢迎喜欢草莓的市民前来采摘，也欢迎各大单位选购精品有机草莓礼盒，有机草莓礼盒是亲朋馈赠、福利送礼的最佳选择。 </dd>
+					<dd>{{goods.gdetail}}</dd>
 				</dl>
 			</div>
-
+			<div class="tab_comment" style="display:none">
+				<form action="">
+					<label>
+						<textarea name="comment_content">富文本</textarea>
+					</label>
+					<br>
+					<input type="submit" value="提交评论" class="btn btn-default">
+				</form>
+			</div>
 		</div>
 	</div>
 
 	<div class="add_jump"></div>
 
 <script type="text/javascript" src="/static/js/detail.js"></script>
+<script type="text/javascript" src="/static/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" >
+    tinyMCE.init({
+        'mode': 'textareas',
+        'theme': 'advanced',
+        'width': 400,
+        'height': 100
+    });
+</script>
 {% endblock body_center%}
 	

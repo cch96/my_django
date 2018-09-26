@@ -1,5 +1,11 @@
 {% extends 'df_user/user_center_base.html'%}
 
+{% block extra %}
+    <script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript">
+    </script>
+{% endblock %}
+
 {% block body_center %}
 	<div class="main_con clearfix">
         <div class="left_menu_con clearfix">
@@ -52,12 +58,10 @@
                 {% if order_info.has_previous == True%}
                 <a href="/user/user_center_order/{{order_info.number|add:+1}}"><上一页</a>
                 {% endif %}
-                {% if order_info.paginator.num_pages < 5 %}
-                    {% for index in order_info.paginator.page_range %}
-                    <a href="/user/user_center_order/{{index}}"
-                       {% if order_info.number == index %} class="active"{% endif %}>{{index}}</a>
-                    {% endfor %}
-                {% endif %}
+                {% for index in order_info.paginator.page_range %}
+                <a href="/user/user_center_order/{{index}}"
+                   {% if order_info.number == index %} class="active"{% endif %}>{{index}}</a>
+                {% endfor %}
                 {% if order_info.has_next == True%}
                 <a href="/user/user_center_order/{{order_info.number|add:+1}}"><下一页</a>
                 {% endif %}
