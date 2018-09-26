@@ -20,10 +20,30 @@ $('.minus').click(function(){
 $('#add_cart').click(function(){
     var data = {
         'goods': $('#goods_id').text(),
-        'num': $num_show.val(),
+        'amount': $num_show.val(),
         'price': $price
     };
+
     $.get('/user/add_cart', data, function(list){
         $('#show_count').text(list.order_num);
     });
+})
+
+//提交购物车数据
+$('.buy_btn').click(function(){
+    var goods_list = []
+    var total = $('.settlements .col03 em').text()
+    id = $('#goods_id').text();
+    var amount = $('.num_show').val()
+    var subtotal = parseFloat($('.show_pirze em').text()) * parseInt(amount)
+    goods = {
+        'goods_id': id,
+        'amount': $('.num_show').val(),
+        'subtotal': subtotal
+    }
+    $.get('/order/to_order', goods, function(data){
+        if (data['code'] == '1'){
+            window.location.href="/order/place_order" + '?order_id=' + data['msg'];
+        }
+    })
 })

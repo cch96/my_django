@@ -13,15 +13,20 @@ def index(request):
     # 看用户是否登入
     order_num = -1
     if 'user_id' in request.session.keys():
-        order_num = UserInfo.objects.get(pk=request.session['user_id']).order_num
+        order_num= UserInfo.objects.get(pk=request.session['user_id']).order_num
     return render(request, 'df_goods/index.html', {'list': list, 'order_num': order_num})
 
 
 def goods_detail(request, no):
     goods = Goods.gmanager.get(pk=no)
     list = Goods.gmanager.filter(gtype_id=goods.gtype_id).order_by('gclick')
-    order_num = UserInfo.objects.get(pk=request.session['user_id']).order_num
+
+    # 如果用户没有登陆则order_num为-1,页面不显示购物车及一些信息
+    order_num = -1
+    if request.session.has_key('user_id'):
+        order_num = UserInfo.objects.get(pk=request.session['user_id']).order_num
     response = render(request, 'df_goods/detail.html', {'goods': goods, 'list': list[: 2], 'order_num':order_num})
+
     # 第一此添加推荐商品
     if 'looks' not in request.COOKIES.keys():
         looks = no

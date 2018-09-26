@@ -15,7 +15,7 @@ class UserInfo(models.Model):
 class UserAddress(models.Model):
     recipients = models.CharField(max_length=16)
     detail_address = models.CharField(max_length=40)
-    mobile_phone = models.IntegerField()
+    mobile_phone = models.CharField(max_length=11)
     zip_code = models.IntegerField()
     user = models.ForeignKey(UserInfo)
 
@@ -23,6 +23,7 @@ class UserAddress(models.Model):
 class Cart(models.Model):
     user = models.ForeignKey(UserInfo)
     goods = models.ForeignKey(Goods)
+    amount = models.IntegerField()
 
 
 

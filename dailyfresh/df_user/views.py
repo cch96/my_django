@@ -1,16 +1,18 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.core import paginator
 from df_user.models import *
 from df_goods.models import *
+from df_order.models import *
 import hashlib
 
 
 def check_login(func):
     # 如果session不存在，则要重新登入(转入到登陆界面)
-    def wrapper(request):
+    def wrapper(request, *args, **kwargs):
         if 'user_id' not in request.session.keys():
             return redirect('/user/login')
-        return func(request)
+        return func(request, *args, **kwargs)
     return wrapper
 
 
@@ -27,7 +29,7 @@ def register(request):
 
 def registerHandle(request):
     # 插入数据库
-    user_register = models.UserInfo()
+    user_register = UserInfo()
     user_register.user = request.POST['user_name']
     user_register.mail = request.POST['email']
     # 判断两次输入的密码是否一致
@@ -87,20 +89,32 @@ def user_center(request):
     result = UserInfo.objects.get(user=request.session['user_name'])
     user = result.user
     mail = result.mail
-    looks = request.COOKIES['looks'].split(',')
-    looks = Goods.gmanager.filter(pk__in=looks)
+    looks = []
+    if 'looks' in request.COOKIES.keys():
+        looks = request.COOKIES['looks'].split(',')
+        looks = Goods.gmanager.filter(pk__in=looks)
     return render(request, 'df_user/user_center_info.html', {'user': user, 'mail': mail, 'looks': looks})
 
 
 @check_login
-def user_center_order(request):
-    return render(request, 'df_user/user_center_order.html')
+def user_center_order(request, no):
+    if no:
+        no = int(no)
+    else:
+        no = 1
+    order = OrderInfo.objects.filter(user_id=request.session['user_id'])
+    order_detail = order[no-1].orderdetail_set.all()
+    pages = paginator.Paginator(order, 1)
+    order_info = pages.page(no)
+    return render(request, 'df_user/user_center_order.html', {'order': order[no-1],
+                                                              'order_info': order_info,
+                                                              'order_detail': order_detail})
 
 
 @check_login
 def user_center_site(request):
     id = request.session['user_id']
-    info = UserAddress.objects.filter(user_id=id)
+    info = UserAddress.objects.get(user_id=id)
     if info:
         context = {
             'recipients': info.recipients,
@@ -135,8 +149,9 @@ def cart(request):
     list = Cart.objects.filter(user_id=request.session['user_id'])
     cart_list = []
     for item in list:
-        cart_list.append(item.goods)
-    return render(request, 'df_user/cart.html', {'list': cart_list})
+        cart_list.append(item)
+    order_num = UserInfo.objects.get(id=request.session['user_id']).order_num
+    return render(request, 'df_user/cart.html', {'list': cart_list, 'order_num': order_num})
 
 
 def add_cart(request):
@@ -146,13 +161,25 @@ def add_cart(request):
         cart = Cart()
         cart.goods_id = request.GET['goods']
         cart.user_id = request.session['user_id']
+        cart.amount = request.GET['amount']
         cart.save()
         # 修改用户的购物车里的商品数量
         user = UserInfo.objects.get(pk=request.session['user_id'])
         user.order_num = user.order_num + 1
         user.save()
         return JsonResponse({'status': 'ok', 'order_num': user.order_num})
-    # 否则
+
+
+def delete_cart(request):
+    # 购物车数据库部分删除
+    cart_id = request.GET['id']
+    order = Cart.objects.get(id=cart_id)
+    order.delete()
+    # 用户购物车数修改
+    user = UserInfo.objects.get(id=request.session['user_id'])
+    user.order_num = user.order_num - 1
+    user.save()
+    return JsonResponse({'status': 'ok'})
 
 
 def quit(request):

@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
                 ('gcomment', tinymce.models.HTMLField(blank=True)),
                 ('gclick', models.IntegerField()),
                 ('isDelete', models.BooleanField(default=False)),
-                ('gpic', models.ImageField(upload_to='df_goods')),
+                ('gthumb', models.ImageField(upload_to='df_goods/goods')),
+                ('gpic', models.ImageField(upload_to='df_goods/pic_detail')),
             ],
         ),
         migrations.CreateModel(
